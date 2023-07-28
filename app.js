@@ -1,15 +1,8 @@
 // Importing required modules
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const _ = require("lodash");
-
-// Pre-defined content for different sections of the website
-const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
-const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
-const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
-
-// Array to store the blog posts
-const posts = [];
 
 // Creating an Express application
 const app = express();
@@ -19,27 +12,80 @@ app.set('view engine', 'ejs');
 
 // Configuring middleware
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(express.static("public"));
 
 // Making the lodash library available as a local variable in all views
 app.locals._ = _;
 
+const staticContentSchema = new mongoose.Schema({
+  page : String,
+  content : String
+});
+const StaticContent = mongoose.model("StaticContent", staticContentSchema);
+
+const blogPostSchema = new mongoose.Schema({
+  title : String,
+  author : {
+    type : String,
+    default : "Soubhik"
+  },
+  content : String,
+  createdAt : String
+});
+const BlogPost = mongoose.model("BlogPost", blogPostSchema);
+
+// Connecting to blogDB (mongoDB database)
+async function connectDatabase() {
+  try {
+    const mongoURI = "mongodb://127.0.0.1:27017/blogDB";
+    mongoose.connect(mongoURI, {
+      useNewUrlParser : true,
+      useUnifiedTopology : true
+    });
+    console.log("Connected to Database!");
+  } catch (error) {
+    console.error("Error in connecting to database");
+  }
+}
+connectDatabase();
+
 // Home route handler
-app.get("/", function(req, res) {
-  res.render("home", {
-    startingContent : homeStartingContent,
-    postsVar : posts
-  });
+app.get("/", async function(req, res) {
+  try {
+    let staticContent = await StaticContent.findOne({page : /home/i}).select('content');
+    let posts = await BlogPost.find({});
+    res.render("home", {
+      staticContent : staticContent.content,
+      posts : posts
+    });
+  } catch (error) {
+    console.error("Error in GET /", error);
+  }
 });
 
 // About route handler
-app.get("/about", function(req, res) {
-  res.render("about", {aboutContentVar : aboutContent});
+app.get("/about", async function(req, res) {
+  try {
+    let staticContent = await StaticContent.findOne({page : /about/i}).select('content');
+    res.render("about", {
+      staticContent : staticContent.content
+    });
+  } catch (error) {
+    console.error("Error in get /about", error);
+  }
 });
 
 // Contact route handler
-app.get("/contact", function(req, res) {
-  res.render("contact", {contactContentVar : contactContent});
+app.get("/contact", async function(req, res) {
+  try {
+    let staticContent = await StaticContent.findOne({page : /contact/i}).select('content');
+    res.render("contact", {
+      staticContent : staticContent.content
+    });
+  } catch (error) {
+    console.error("Error in get /contact", error);
+  }
 });
 
 // Compose route handlers
@@ -48,30 +94,62 @@ app.get("/compose", function(req, res) {
 });
 
 // Handling the POST request when creating a new blog post
-app.post("/compose", function(req, res) {
-  const post = {
-    title : req.body.postTitle, // Extracting the title from the request body
-    content : req.body.postBody // Extracting the content from the request body
-  };
-  posts.push(post);          // Adding the new post to the global posts array
-  
-  res.redirect("/");        // Redirecting the user back to the home page
+app.post("/compose", async function(req, res) {
+  try {
+    const post = {
+      title : req.body.title,
+      author : req.body.author,
+      content : req.body.content,
+      createdAt : req.body.createdAt
+    }
+    await BlogPost.create(post);
+    res.redirect("/");        // Redirecting the user back to the home page
+  } catch (error) {
+    console.error("Error in post /compose", error);
+  }
 });
 
 // Dynamic route handler of individual blogs
-app.get("/posts/:postName", function(req, res) {
-  const postName = _.lowerCase(req.params.postName);
-  for(let i = 0; i < posts.length; i++) {
-    if(_.lowerCase(posts[i].title) === postName) {  // Checking if the post title matches the requested post name
-      res.render("post", {
-        postTitleVar : posts[i].title,            // Passing the post title to the post.ejs view
-        postContentVar : posts[i].content         // Passing the post content to the post.ejs view
-      });
+app.get("/posts/:postTitle", async function(req, res) {
+  try {
+    const title = req.params.postTitle;
+    const post = await BlogPost.findOne({
+      title : title
+    });
+
+    if (!post) {
+      // Post not found in the database
+      return res.status(404).render("404");
     }
+    res.render("post", {
+      post : post
+    });
+  } catch (error) {
+    console.log("Error in get /posts/", error);
+  }  
+});
+
+// Catch-all route for non-existent routes
+app.get("*", async function(req, res) {
+  try {
+    res.status(404).render("404");
+  } catch (error) {
+    console.error("Error in 404 route", error);
   }
 });
 
 // Starting the server
 app.listen(process.env.PORT || 3000, function() {
-  console.log("Server started on port 3000");
+  console.log("Server started!");
+});
+
+process.on('SIGINT', async () => {
+  try {
+    await mongoose.connection.close();
+    console.log("Closed Database connection");
+    process.exit(0);
+  } catch (error) {
+    console.error("Error in closing connection", error);
+    process.exit(1);
+  }
 });

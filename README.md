@@ -1,41 +1,48 @@
 # Beginner Blog Application
-A simple blog website created using EJS templates and Express without any database. It demonstrates how to render EJS templates and utilize dynamic Express routes.
+A simple blog website created using EJS templates and Express with MongoDB database integration. It demonstrates how to render EJS templates, utilize dynamic Express routes, and perform CRUD operations with MongoDB.
 
 ## Features
 * Simple Node.js web application that renders HTML content using EJS templates.
 * Every new post created gets a dynamic route for individual access.
 * Bootstrap has been used for styling.
+* Custom 404 page to handle routes that do not exist.
+* Integration with MongoDB to store and retrieve blog posts and static content.
 
 ## Directory Structure
 ```
 📦 beginner-blog-application
  ┣ 📂 public
- ┃ ┗ 📂 css
- ┃   ┗ 📜 styles.css
+ ┃ ┣ 📂 css
+ ┃ ┃ ┗ 📜 styles.css
+ ┃ ┗ 📂 js
+ ┃   ┗ 📜 compose-script.js
  ┣ 📂 views
  ┃ ┣ 📜 home.ejs
  ┃ ┣ 📜 about.ejs
  ┃ ┣ 📜 contact.ejs
  ┃ ┣ 📜 compose.ejs
  ┃ ┣ 📜 post.ejs
+ ┃ ┣ 📜 404.ejs
  ┃ ┗ 📂 partials
  ┃   ┣ 📜 header.ejs
  ┃   ┗ 📜 footer.ejs
  ┣ 📜 app.js
  ┣ 📜 package.json
- ┗ 📜 package-lock.json
+ ┣ 📜 package-lock.json
+ ┗ 📜 insertStaticContent.js
 ```
 
 In this directory structure:
 
-- The `public` directory contains the static assets for your application, such as the css directory with the `styles.css` file.
-- The views directory holds the EJS templates for your application, including home.ejs, about.ejs, contact.ejs, compose.ejs, and post.ejs.
-    - Additionally, the partials directory inside views contains the reusable partial templates, specifically header.ejs and footer.ejs.
-- The app.js file is responsible for handling all the routes and logic of your blog application.
-- The package.json and package-lock.json files store the configuration and dependencies for your project.
+* The public directory contains the static assets for your application, such as the css directory with the styles.css file and the js directory with the compose-script.js file.
+* The views directory holds the EJS templates for your application, including home.ejs, about.ejs, contact.ejs, compose.ejs, post.ejs, and 404.ejs.
+    * Additionally, the partials directory inside views contains the reusable partial templates, specifically header.ejs and footer.ejs.
+* The **app.js** file is responsible for handling all the routes and logic of your blog application.
+* The insertStaticContent.js file in the root directory is used to insert static content into the MongoDB collection.
+* The package.json and package-lock.json files store the configuration and dependencies for your project.
 
 ## How to run the project in your local system?
-- Make sure that you have node and git installed in your system.
+- Make sure that you have node, git and MongoDB installed in your system.
 - Clone the repository to your local machine
 ```bash
 git clone https://github.com/sushruta19/beginner-blog-application.git
@@ -48,7 +55,11 @@ cd beginner-blog-application
 ```bash
 npm install
 ```
-- Once the dependencies are installed, start the server by running the command
+- Once the dependencies are installed, run the `insertStaticContent.js` script.
+```bash
+node insertStaticContent.js
+```
+- Start the server by running the command
 ```bash
 npm start
 ```

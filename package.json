@@ -1,7 +1,7 @@
 {
   "name": "simple-blog-application",
   "version": "1.0.0",
-  "description": "A simple blog website created using EJS templates and Express without any database. It demonstrates how to render EJS templates and utilize dynamic Express routes",
+  "description": "A simple blog website created using EJS templates and Express with MongoDB database integration. It demonstrates how to render EJS templates, utilize dynamic Express routes, and perform CRUD operations with MongoDB.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,6 +13,7 @@
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "mongoose": "^7.4.1"
   }
 }

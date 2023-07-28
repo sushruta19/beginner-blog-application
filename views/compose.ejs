@@ -3,14 +3,19 @@
 <h1>Compose</h1>
 <form action="/compose" method="post">
   <div class="form-group">
-    <label for="postTitle">Title</label>
-    <input id="postTitle" type="text" class="form-control" name="postTitle" required>
+    <label for="title">Title</label>
+    <input id="title" type="text" class="form-control" name="title" required>
     <br>
-    <label for="postBody">Post</label>
-    <textarea name="postBody" id="postBody" class="form-control" rows="10"></textarea>
+    <label for="author">Author</label>
+    <input id="author" type="text" class="form-control" name="author">
+    <br>
+    <label for="content">Post</label>
+    <textarea name="content" id="content" class="form-control" rows="10"></textarea>
   </div>
-  
-  <button type="submit" class="btn btn-primary">Publish</button>
+  <input type="hidden" id="createdAt" name="createdAt" value="">
+  <button type="submit" id="publishBtn" class="btn btn-primary">Publish</button>
 </form>
+
+<script src="/js/compose-script.js"></script>
 
 <%- include("partials/footer") -%>
