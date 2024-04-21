@@ -5,7 +5,6 @@ A simple blog website created using EJS templates and Express with MongoDB datab
 * Simple Node.js web application that renders HTML content using EJS templates.
 * Every new post created gets a dynamic route for individual access.
 * Bootstrap has been used for styling.
-* Custom 404 page to handle routes that do not exist.
 * Integration with MongoDB to store and retrieve blog posts and static content.
 
 ## Directory Structure
